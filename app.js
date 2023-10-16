@@ -1,20 +1,24 @@
-import express, { json } from 'express' // require -> commonJS
-import { createMovieRouter } from './routes/movies.js'
-import { corsMiddleware } from './middlewares/cors.js'
-import 'dotenv/config'
+import express, { json } from "express"
+import { corsRules } from "./middlewares/cors.js"
+import "dotenv/config"
 
-// después
-export const createApp = ({ movieModel }) => {
-  const app = express()
-  app.use(json())
-  app.use(corsMiddleware())
-  app.disable('x-powered-by')
+import { createMovieRouter } from "./routes/movies.js"
+import { MovieModel as movieModel } from "./models/local-file-system/movie.js"
+// import { MovieModel } from "./models/mysql/movie.js"
 
-  app.use('/movies', createMovieRouter({ movieModel }))
+const createApp = () => {
+	const app = express()
+	app.use(json())
+	app.use(corsRules())
+	app.disable("x-powered-by")
 
-  const PORT = process.env.PORT ?? 1234
+	app.use("/movies", createMovieRouter({ movieModel }))
 
-  app.listen(PORT, () => {
-    console.log(`server listening on port http://localhost:${PORT}`)
-  })
+	const PORT = process.env.PORT ?? 0
+
+	app.listen(PORT, () => {
+		console.log(`Server ready on: http://localhost:${PORT}`)
+	})
 }
+
+createApp()
