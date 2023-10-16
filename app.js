@@ -14,7 +14,7 @@ const createApp = () => {
 
 	app.use("/movies", createMovieRouter({ movieModel }))
 
-	const PORT = process.env.PORT ?? 0
+	const PORT = process.env.API_PORT ?? 0
 
 	app.listen(PORT, () => {
 		console.log(`Server ready on: http://localhost:${PORT}`)
