@@ -2,22 +2,21 @@ import express, { json } from "express"
 import { corsRules } from "./middlewares/cors.js"
 import "dotenv/config"
 
-import { createMovieRouter } from "./routes/movies.js"
-import { MovieModel as movieModel } from "./models/local-file-system/movie.js"
-// import { MovieModel } from "./models/mysql/movie.js"
+import { edoCtaRouter } from "./routes/edoCta.js"
 
 const createApp = () => {
+	const HOST = process.env.API_HOST ?? "localhost"
+	const PORT = process.env.API_PORT ?? 0
 	const app = express()
+
 	app.use(json())
 	app.use(corsRules())
 	app.disable("x-powered-by")
 
-	app.use("/movies", createMovieRouter({ movieModel }))
-
-	const PORT = process.env.API_PORT ?? 0
+	edoCtaRouter({ app })
 
 	app.listen(PORT, () => {
-		console.log(`Server ready on: http://localhost:${PORT}`)
+		console.log(`Servidor en linea: http://${HOST}:${PORT}`)
 	})
 }
 
