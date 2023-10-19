@@ -5,7 +5,7 @@ import "dotenv/config"
 import { edoCtaRouter } from "./routes/edoCta.js"
 
 const createApp = () => {
-	const HOST = process.env.API_HOST ?? "localhost"
+	const HOST = process.env.HOST ?? "localhost"
 	const PORT = process.env.PORT ?? 0
 	const app = express()
 
@@ -19,7 +19,7 @@ const createApp = () => {
 		res.status(200).json({ status: "OK" })
 	})
 
-	app.listen(PORT, () => {
+	app.listen(PORT, HOST, () => {
 		console.log(`Servidor en linea: http://${HOST}:${PORT}`)
 	})
 }
