@@ -9,7 +9,7 @@ const configuracion = {
     database: process.env.DB_DATABASE
 }
 
-const conexion = await mysql.createConnection(JSON.parse(configuracion))
+const conexion = await mysql.createConnection(configuracion)
 
 export class EdoCtaModel {
     static errorInfo = {
