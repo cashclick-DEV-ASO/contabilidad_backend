@@ -1,7 +1,13 @@
 import mysql from 'mysql2/promise'
 import { responde } from '../utils.js'
 
-const configuracion = process.env.DATABASE_CONFIG ?? process.env.DEFAULT_DB_CONFIG
+const configuracion = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
+}
 
 const conexion = await mysql.createConnection(JSON.parse(configuracion))
 
