@@ -2,7 +2,7 @@ import cors from "cors"
 
 export const corsRules = ({ accepted = (process.env.ORIGINS || "*") } = {}) => cors({
 	origin: (origin, callback) => {
-		if (accepted.includes(origin)) {
+		if (accepted.split(",").includes(origin)) {
 			return callback(null, true)
 		}
 

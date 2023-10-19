@@ -13,7 +13,7 @@ const createApp = () => {
 	app.use(corsRules())
 	app.disable("x-powered-by")
 
-	edoCtaRouter({ app })
+	edoCtaRouter(app)
 
 	app.listen(PORT, () => {
 		console.log(`Servidor en linea: http://${HOST}:${PORT}`)

@@ -1,13 +1,19 @@
 import z from "zod"
 
 const edoCtaSchema = z.object({
-    periodo: z.int({
-        required_error: "El periodo es requerido.",
-        invalid_type_error: "El periodo debe ser numerico."
-    }),
+    periodo: z.number(),
     archivo: z.string(),
-    id_cta: z.int(),
-    fechaCaptura: z.date().default(new Date()),
+    idCta: z.number(),
+    movimientos: z.array(z.object({
+        linea: z.number(),
+        informacion: z.string(),
+        fechaCreacion: z.coerce.date(),
+        fechaValor: z.coerce.date(),
+        concepto: z.string(),
+        tipo: z.string().max(1).toUpperCase(),
+        monto: z.number(),
+        idLayout: z.number()
+    })).min(1)
 })
 
 export const validaEdoCta = datos => {

@@ -1,22 +1,61 @@
 import mysql from 'mysql2/promise'
-import { manejoExito, manejoError } from '../utils.js'
+import { responde } from '../utils.js'
 
-const configuracion = process.env.DATABASE_URL ?? process.env.DEFAULT_DB_CONFIG
+const configuracion = process.env.DATABASE_CONFIG ?? process.env.DEFAULT_DB_CONFIG
 
-const conexion = await mysql.createConnection(configuracion)
+const conexion = await mysql.createConnection(JSON.parse(configuracion))
 
 export class EdoCtaModel {
-    static async insertarEdoCta({ datos }) {
-        const { periodo, archivo, id_cta, fechaCaptura } = datos
+    static errorInfo = {
+        modulo: "EdoCtaModel",
+        funcion: "",
+        mensaje: ""
+    }
+
+    /**
+     * @param {object} datos - Objeto con los datos para insertar el estado de cuenta
+     * @returns {object} Objeto JSON con el resultado de la operación
+     */
+    static async insertaEdoCta(datos) {
+        if (!datos) return sinDatos()
 
         try {
-            const dbResultado = await conexion.query(`INSERT INTO edo_cta VALUES (?,?,?,?,?)`,
-                ["NULL", periodo, archivo, fechaCaptura, id_cta])
-            return manejoExito({ idCreado: dbResultado[0].insertId })
+            const { periodo, archivo, idCta } = datos
+            const dbResultado = await conexion.query(
+                `INSERT INTO edo_cta (periodo, archivo, id_cuenta) VALUES (?,?,?)`,
+                [periodo, archivo, idCta])
+            return responde({ idCreado: dbResultado[0].insertId })
         } catch (error) {
-            return manejoError({ error })
+            this.errorInfo.mensaje = "Error al insertar el estado de cuenta."
+            return responde(this.errorInfo, error)
         }
     }
 
+    /**
+     * @param {object} datos - Objeto con las transacciones a insertar
+     * @returns {object} Objeto JSON con el resultado de la operación
+     */
+    static async insertamovimientos(datos) {
+        if (!datos) return sinDatos()
+        //`INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout)
+        try {
+            const { id_edo_cta, fecha, descripcion, cargo, abono } = datos
+            const dbResultado = await conexion.query(
+                `INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout) VALUES (?,?,?,?,?)`,
+                [id_edo_cta, fecha, descripcion, cargo, abono])
+            return responde({ idCreado: dbResultado[0].insertId })
+        } catch (error) {
+            this.errorInfo.mensaje = "Error al insertar las transacciones."
+            return responde(this.errorInfo, error)
+        }
+    }
 
+    sinDatos = () => {
+        this.errorInfo.mensaje = "No se proporcionaron datos."
+        return responde(this.errorInfo, {
+            modulo: "EdoCtaModel",
+            message: "El parametro requerido no fue proporcionado.",
+            fecha: new Date()
+        })
+    }
 }
