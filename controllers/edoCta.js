@@ -5,6 +5,7 @@ export class EdoCtaController {
         this.edoCtaModel = edoCtaModel
     }
 
+    
     insertarTransacciones = (req, res) => {
         const valores = req.body
         const validacion = validaEdoCta(valores)
