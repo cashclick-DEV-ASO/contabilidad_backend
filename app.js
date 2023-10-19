@@ -16,7 +16,7 @@ const createApp = () => {
 	edoCtaRouter(app)
 
 	app.get("/status", (req, res) => {
-		res.status(200).json({ status: "OK" })
+		res.status(200).json({ status: "OK", message: "Servidor en linea" })
 	})
 
 	app.listen(PORT, HOST, () => {
