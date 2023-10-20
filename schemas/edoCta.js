@@ -8,7 +8,7 @@ const edoCtaSchema = z.object({
         linea: z.number(),
         informacion: z.string(),
         fechaCreacion: z.coerce.date(),
-        fechaValor: z.coerce.date(),
+        fechaValor: z.coerce.date(), //.transform
         concepto: z.string(),
         tipo: z.string().max(1).toUpperCase(),
         monto: z.number(),

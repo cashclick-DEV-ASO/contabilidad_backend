@@ -11,12 +11,11 @@ export const edoCtaRouter = (app, edoCtaModel = defaultModel) => {
 	const edoCtaRouter = Router()
 	const edoCtaController = new EdoCtaController(edoCtaModel)
 
+	edoCtaRouter.get("/", (req, res) => {
+		return res.status(200).json({ success: true })
+	})
 	edoCtaRouter.post("/", edoCtaController.insertarTransacciones)
 	// edoCtaRouter.post("/", edoCtaController.create)
-
-	// edoCtaRouter.get("/:id", edoCtaController.getById)
-	// edoCtaRouter.delete("/:id", edoCtaController.delete)
-	// edoCtaRouter.patch("/:id", edoCtaController.update)
 
 	app.use("/edo_cta", edoCtaRouter)
 }

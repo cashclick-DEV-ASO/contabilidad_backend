@@ -30,10 +30,31 @@ export class EdoCtaModel {
             const dbResultado = await conexion.query(
                 `INSERT INTO edo_cta (periodo, archivo, id_cuenta) VALUES (?,?,?)`,
                 [periodo, archivo, idCta])
-            return responde({ idCreado: dbResultado[0].insertId })
+
+            if (dbResultado[0].affectedRows == 0) throw new Error("No se insertó el estado de cuenta.")
+
+            datos.idArchivo = dbResultado[0].insertId
+            return responde({ idCreado: datos.idArchivo })
         } catch (error) {
-            this.errorInfo.mensaje = "Error al insertar el estado de cuenta."
-            return responde(this.errorInfo, error)
+            return responde({ mensaje: "Error al insertar el estado de cuenta." }, error)
+        }
+    }
+
+    /**
+     * @param {number} id - ID del estado de cuenta a eliminar
+     * @returns {object} Objeto JSON con el resultado de la operación
+     */
+    static async eliminaEdoCta(id) {
+        if (!id) return sinDatos()
+
+        try {
+            const dbResultado = await conexion.query(
+                `DELETE FROM edo_cta WHERE id = ?`,
+                [id])
+
+            return responde({ eliminado: dbResultado[0].affectedRows })
+        } catch (error) {
+            return responde({ mensaje: "Error al eliminar el estado de cuenta." }, error)
         }
     }
 
@@ -41,27 +62,33 @@ export class EdoCtaModel {
      * @param {object} datos - Objeto con las transacciones a insertar
      * @returns {object} Objeto JSON con el resultado de la operación
      */
-    static async insertamovimientos(datos) {
-        if (!datos) return sinDatos()
-        //`INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout)
+    static async insertaMovimientos(datos) {
+        if (!datos || datos.movimientos.length == 0) return sinDatos()
+        let e
+        const qry = "INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout) VALUES ?"
+        const valores = datos.movimientos.map(movimiento => {
+            return [datos.idArchivo, movimiento.linea, movimiento.informacion, movimiento.fechaCreacion, movimiento.fechaValor, movimiento.concepto, movimiento.tipo, movimiento.monto, movimiento.idLayout]
+        })
         try {
-            const { id_edo_cta, fecha, descripcion, cargo, abono } = datos
-            const dbResultado = await conexion.query(
-                `INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout) VALUES (?,?,?,?,?)`,
-                [id_edo_cta, fecha, descripcion, cargo, abono])
-            return responde({ idCreado: dbResultado[0].insertId })
+            await conexion.beginTransaction()
+            const [response, meta] = await conexion.query(qry, [valores])
+            await conexion.commit()
+
+            return responde({ msg: "Transacciones insertadas correctamente." })
         } catch (error) {
-            this.errorInfo.mensaje = "Error al insertar las transacciones."
-            return responde(this.errorInfo, error)
+            await conexion.rollback()
+            e = error
         }
+        return responde({ msg: "Error al insertar las transacciones." }, e)
     }
 
-    sinDatos = () => {
-        this.errorInfo.mensaje = "No se proporcionaron datos."
+    sinDatos = (funcion = "") => {
+        this.errorInfo.mensaje = "No se proporcionaron datos para registrar."
         return responde(this.errorInfo, {
+            fecha: new Date(),
             modulo: "EdoCtaModel",
-            message: "El parametro requerido no fue proporcionado.",
-            fecha: new Date()
+            funcion,
+            message: "Los parametros requeridos no fueron proporcionados.",
         })
     }
 }
