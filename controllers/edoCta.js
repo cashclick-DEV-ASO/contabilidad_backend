@@ -4,6 +4,7 @@ export class EdoCtaController {
     constructor(edoCtaModel) {
         this.edoCtaModel = edoCtaModel
     }
+    
 
     insertarTransacciones = async (req, res) => {
         const valores = req.body
