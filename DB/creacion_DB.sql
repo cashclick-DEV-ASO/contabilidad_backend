@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`transaccion_banco` (
     `tipo` VARCHAR(1) NOT NULL,
     `monto` DECIMAL NOT NULL DEFAULT 0,
     `id_layout` INT NOT NULL,
+    `visible` TINYINT(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`),
     INDEX `lyt_idx` (`id_layout` ASC) VISIBLE,
     INDEX `arch_idx` (`id_edo_cta` ASC) VISIBLE,
