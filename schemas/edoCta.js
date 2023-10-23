@@ -18,4 +18,8 @@ const edoCtaSchema = z.object({
     movimientos: z.array(trnSchema).min(1)
 })
 
-export const validaEdoCta = datos => edoCtaSchema.safeParse(datos)
+const insertaTransacciones = datos => edoCtaSchema.safeParse(datos)
+
+export default {
+    insertaTransacciones
+}

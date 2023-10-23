@@ -1,46 +1,37 @@
-import { responde, fechaMySQL } from "../utils.js"
-import db from "../DB/pool.js"
+import { Modelo } from "./modelo.js"
 
 const qryEdoCta = "INSERT INTO edo_cta (periodo, archivo, id_cuenta) VALUES (?,?,?)"
 const qryMovimientos = "INSERT INTO transaccion_banco (id_edo_cta, linea, informacion, fecha_creacion, fecha_valor, concepto, tipo, monto, id_layout) VALUES ?"
 
-export class EdoCtaModel {
-    static async insertaTransacciones(datos) {
-        if (!datos) return sinDatos(`La función insertaTransacciones de la clase EdoCtaModel no recibió datos.`)
+export class EdoCtaModel extends Modelo {
+    constructor(db) { super(db) }
 
-        let conexion = null
-        let error = null
-        let msg = "Transacciones insertadas correctamente."
+    static async insertaTransacciones(datos) {
+        if (!datos) return this.sinDatos("La función insertaTransacciones de la clase EdoCtaModel no recibió datos.")
+
+        this.mensaje = "Transacciones agreagadas correctamente."
 
         try {
-            conexion = await db.getConnection()
-            await conexion.beginTransaction()
+            this.conexion = await this.db.getConnection()
+            await this.conexion.beginTransaction()
             const { periodo, archivo, idCta } = datos
-            const [resultadoEdoCta] = await conexion.query(qryEdoCta, [periodo, archivo, idCta])
+            const [resultadoEdoCta] = await this.conexion.query(qryEdoCta, [periodo, archivo, idCta])
             if (resultadoEdoCta.affectedRows == 0) throw new Error("No se logro insertar el estado de cuenta.")
             const idArchivo = resultadoEdoCta.insertId
             const valores = datos.movimientos.map(movimiento => {
-                return [idArchivo, movimiento.linea, movimiento.informacion, fechaMySQL(movimiento.fechaCreacion), movimiento.fechaValor, movimiento.concepto, movimiento.tipo, movimiento.monto, movimiento.idLayout]
+                return [idArchivo, movimiento.linea, movimiento.informacion, this.fechaMySQL(movimiento.fechaCreacion), this.fechaMySQL(movimiento.fechaValor), movimiento.concepto, movimiento.tipo, movimiento.monto, movimiento.idLayout]
             })
             const [resultadoMov] = await conexion.query(qryMovimientos, [valores])
             if (resultadoMov.affectedRows == 0) throw new Error("No se logro insertar las transacciones.")
-            await conexion.commit()
+            await this.conexion.commit()
         } catch (e) {
-            await conexion.rollback()
-            error = e
-            msg = "Error al insertar las transacciones."
+            if (this.conexion) this.conexion.rollback()
+            this.error = e
+            this.mensaje = "Error al insertar las transacciones."
         } finally {
-            conexion.release()
+            if (this.conexion) this.conexion.release()
         }
-        return responde({ msg }, error)
-    }
 
-    sinDatos = (message = "") => {
-        return responde(
-            { msg: "No se proporcionaron datos para registrar." },
-            {
-                fecha: new Date(),
-                message
-            })
+        return this.responde({ mensaje: this.mensaje }, this.error)
     }
 }

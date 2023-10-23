@@ -8,6 +8,6 @@ export const configuracionCORS = (aceptados = process.env.ORIGINS || "*") => cor
 		if (!origin)
 			return callback(null, true)
 
-		return callback("Not allowed by CORS")
+		return callback("Not allowed")
 	}
 })

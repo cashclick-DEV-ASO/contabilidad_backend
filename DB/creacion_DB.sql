@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`transaccion_mambu` (
     `tipo` VARCHAR(1) NOT NULL,
     `monto` DECIMAL NOT NULL DEFAULT 0,
     `informacion` VARCHAR(500) NOT NULL,
+    `visible` TINYINT(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -113,6 +114,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`transaccion_dwh` (
     `iva_interes` DECIMAL NOT NULL DEFAULT 0,
     `penalizacion` DECIMAL NOT NULL DEFAULT 0,
     `iva_penalizacion` DECIMAL NOT NULL DEFAULT 0,
+    `visible` TINYINT(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -183,8 +185,11 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`banco_dwh` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`perfil` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(45) NOT NULL,
-    `permisos_db` JSON NOT NULL,
-    `permisos_front` JSON NOT NULL,
+    `banco` TINYINT(1) NOT NULL DEFAULT 0,
+    `cuenta` TINYINT(1) NOT NULL DEFAULT 0,
+    `transaccion` TINYINT(1) NOT NULL DEFAULT 0,
+    `cuenta_contable` TINYINT(1) NOT NULL DEFAULT 0,
+    `usuario` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -194,12 +199,10 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`perfil` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`usuario` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `id_perfil` INT NOT NULL,
-    `correo` VARCHAR(45) NOT NULL,
-    `nombre` VARCHAR(45) NOT NULL,
-    `password` VARCHAR(500) NOT NULL,
+    `usuario` VARCHAR(50) NOT NULL,
+    `credenciales` BLOB NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `id_prf_idx` (`id_perfil` ASC) VISIBLE,
-    UNIQUE INDEX `correo_UNIQUE` (`correo` ASC) VISIBLE,
     FOREIGN KEY (`id_perfil`) REFERENCES `contabilidad`.`perfil` (`id`)
 ) ENGINE = InnoDB;
 
@@ -226,27 +229,132 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`bitacora_cambios` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `contabilidad`.`sesion` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `id_usuario` INT NOT NULL,
     `token` VARCHAR(45) NOT NULL,
-    `creacion` TIMESTAMP(6) NOT NULL,
-    `vencimiento` TIMESTAMP(6) NOT NULL,
+    `id_usuario` INT NOT NULL,
+    `creacion` TIMESTAMP NOT NULL DEFAULT NOW(),
+    `vencimiento` TIMESTAMP NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 30 MINUTE)),
     PRIMARY KEY (`id`),
     INDEX `id_usrs_idx` (`id_usuario` ASC) VISIBLE,
     UNIQUE INDEX `token_UNIQUE` (`token` ASC) VISIBLE,
     FOREIGN KEY (`id_usuario`) REFERENCES `contabilidad`.`usuario` (`id`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `contabilidad`.`banco` (Nombre, Nombre_Legal) VALUES
-("BBVA", "BBVA México, S.A., Institución de Banca Múltiple"),
-("Conekta", "GRUPO CONEKTAME SA DE CV"),
-("STP", "SISTEMA DE TRANSFERENCIAS Y PAGOS STP, S.A. DE C.V. INSTITUCIÓN DE FONDOS DE PAGO ELECTRÓNICO");
+-- -----------------------------------------------------
+-- Table `contabilidad`.`intento_acceso`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `contabilidad`.`intento_acceso` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `fecha` TIMESTAMP NOT NULL DEFAULT NOW(),
+    `usuario` VARCHAR(45) NULL,
+    `pass` VARCHAR(45) NOT NULL,
+    `ip` VARCHAR(45),
+    `host` VARCHAR(45),
+    PRIMARY KEY (`id`),
+    INDEX `id_idx` (`id` ASC) VISIBLE
+) ENGINE = InnoDB;
 
-INSERT INTO `contabilidad`.`layout` (id_banco, layout) VALUES
-(1, JSON_OBJECT("tipo", "ancho_fijo", "campos", JSON_OBJECT("idMov", JSON_OBJECT("inicio", 0, "espacios", 3), "fecha", JSON_OBJECT("inicio", 3, "espacios", 8), "concepto", JSON_OBJECT("inicio", 11, "espacios", 20), "monto", JSON_OBJECT("inicio", 31, "espacios", 10)))),
-(2, JSON_OBJECT("tipo", "delimitado", "separador", "|", "campos", JSON_OBJECT("idMov", 0, "fecha", 1, "concepto", 2, "monto", 3))),
-(3, JSON_OBJECT("tipo", "delimitado", "separador", "|", "campos", JSON_OBJECT("idMov", 0, "fecha", 1, "concepto", 2, "monto", 3)));
+INSERT INTO
+    `contabilidad`.`banco` (Nombre, Nombre_Legal)
+VALUES
+    (
+        "BBVA",
+        "BBVA México, S.A., Institución de Banca Múltiple"
+    ),
+    ("Conekta", "GRUPO CONEKTAME SA DE CV"),
+    (
+        "STP",
+        "SISTEMA DE TRANSFERENCIAS Y PAGOS STP, S.A. DE C.V. INSTITUCIÓN DE FONDOS DE PAGO ELECTRÓNICO"
+    );
 
-INSERT INTO `contabilidad`.`cuenta_bancaria` (cta, id_banco, comentarios) VALUES
-("0123456789", 1, "Cuenta de prueba"),
-("0123456789", 2, "Cuenta de prueba"),
-("0123456789", 3, "Cuenta de prueba");
+INSERT INTO
+    `contabilidad`.`layout` (id_banco, layout)
+VALUES
+    (
+        1,
+        JSON_OBJECT(
+            "tipo",
+            "ancho_fijo",
+            "campos",
+            JSON_OBJECT(
+                "idMov",
+                JSON_OBJECT("inicio", 0, "espacios", 3),
+                "fecha",
+                JSON_OBJECT("inicio", 3, "espacios", 8),
+                "concepto",
+                JSON_OBJECT("inicio", 11, "espacios", 20),
+                "monto",
+                JSON_OBJECT("inicio", 31, "espacios", 10)
+            )
+        )
+    ),
+    (
+        2,
+        JSON_OBJECT(
+            "tipo",
+            "delimitado",
+            "separador",
+            "|",
+            "campos",
+            JSON_OBJECT(
+                "idMov",
+                0,
+                "fecha",
+                1,
+                "concepto",
+                2,
+                "monto",
+                3
+            )
+        )
+    ),
+    (
+        3,
+        JSON_OBJECT(
+            "tipo",
+            "delimitado",
+            "separador",
+            "|",
+            "campos",
+            JSON_OBJECT(
+                "idMov",
+                0,
+                "fecha",
+                1,
+                "concepto",
+                2,
+                "monto",
+                3
+            )
+        )
+    );
+
+INSERT INTO
+    `contabilidad`.`cuenta_bancaria` (cta, id_banco, comentarios)
+VALUES
+    ("0123456789", 1, "Cuenta de prueba"),
+    ("0123456789", 2, "Cuenta de prueba"),
+    ("0123456789", 3, "Cuenta de prueba");
+
+INSERT INTO
+    `contabilidad`.`perfil` (nombre, banco, cuenta, transaccion, cuenta_contable, usuario)
+VALUES
+    ("dios", 1, 1, 1, 1, 1),
+    ("director", 1, 1, 1, 1, 1),
+    ("gerente", 0, 0, 0, 0, 0),
+    ("analista", 0, 0, 0, 0, 0),
+    ("ejecutivo", 0, 0, 0, 0, 0);
+
+INSERT INTO
+    `contabilidad`.`usuario` (id_perfil, usuario, credenciales)
+VALUES
+    (
+        1,
+        "alberto.so@cashclick.com",
+        AES_ENCRYPT("aqui yo soy dios", "PASS_KNT")
+    ),
+    (
+        2,
+        "usuario1@temporal.com",
+        AES_ENCRYPT("pass temp", "PASS_KNT")
+    );
+

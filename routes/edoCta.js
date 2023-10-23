@@ -1,21 +1,17 @@
 import { Router } from "express"
 import { EdoCtaController } from "../controllers/edoCta.js"
-import { EdoCtaModel as defaultModel } from "../models/edoCta.js"
 
 /**
 * @param {Object} app - Express app
-* @param {Object} edoCtaModel - Modelo de estado de cuenta
+* @param {Modelos} modelos - Catalogo con los modelos a utilizar
 * @returns {void} Router de estado de cuenta
 */
-export const edoCtaRouter = (app, edoCtaModel = defaultModel) => {
-	const edoCtaRouter = Router()
-	const edoCtaController = new EdoCtaController(edoCtaModel)
+export const edoCtaRouter = (app, modelos) => {
+	const enrutador = Router()
+	const controlador = new EdoCtaController(modelos.edoCta)
 
-	edoCtaRouter.get("/", (req, res) => {
-		return res.status(200).json({ success: true })
-	})
-	edoCtaRouter.post("/", edoCtaController.insertarTransacciones)
-	// edoCtaRouter.post("/", edoCtaController.create)
+	enrutador.post("/", controlador.insertarTransacciones)
+	// enrutador.post("/", controlador.create)
 
-	app.use("/edo_cta", edoCtaRouter)
+	app.use("/edo_cta", enrutador)
 }

@@ -1,30 +1,38 @@
 import express, { json } from "express"
 import { configuracionCORS } from "./middlewares/cors.js"
-import { responde } from "./utils.js"
+import { validaSesion } from "./middlewares/sesion.js"
 import "dotenv/config"
 
+import { Modelos } from "./models/modelos.js"
+import { loginRouter } from "./routes/login.js"
 import { edoCtaRouter } from "./routes/edoCta.js"
 
 const createApp = () => {
 	const HOST = process.env.HOST ?? "0.0.0.0"
 	const PORT = process.env.PORT ?? 0
 	const app = express()
+	const modelos = new Modelos()
 
+	// Middlewares
 	app.use(json())
 	app.use(configuracionCORS())
+	app.use(validaSesion(modelos))
 	app.disable("x-powered-by")
 
-	app.get("/status", (req, res) => {
-		res.status(200).json({ status: "OK", message: "Servidor en linea" })
-	})
+	// Rutas
+	loginRouter(app, modelos)
+	edoCtaRouter(app, modelos)
 
-	edoCtaRouter(app)
+	app.get("/status", (req, res) => res.status(200).json({ status: "OK", message: "Servidor en linea" }))
 
-	app.use((req, res) => res.status(404).send("<h1>404</h1><p>Resourse not found</p>"))
+	// Manejo de errores
 	app.use((err, req, res, next) => {
-		console.error(err.stack)
-		res.status(500).send("<h1>500</h1><p>Server error</p>")
+		console.log("Error");
+		if (err) return res.status(500).json({ status: "ERROR", message: err.message })
 	})
+	app.use((req, res) => res.status(404).send("<h1>404</h1><p>Resourse not found</p>"))
+
+	// Inicia el servidor
 	app.listen(PORT, HOST, () => console.log(`Servidor en linea: http://${HOST}:${PORT}`))
 }
 
