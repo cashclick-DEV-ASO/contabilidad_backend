@@ -29,20 +29,20 @@ export class LoginModel extends Modelo {
             }
             await this.conexion.commit()
         } catch (e) {
-            await this.conexion.rollback()
+            if (this.conexion) await this.conexion.rollback()
             this.error = e
             this.mensaje = "Error al autenticar al usuario."
         } finally {
-            this.conexion.release()
+            if (this.conexion) this.conexion.release()
         }
 
-        return this.responde({ mensaje: this.mensaje, token: this.token }, this.error)
+        return this.responde({ mensaje: this.mensaje, token: this.token, nombre: this.nombre }, this.error)
     }
 
-    async loginFallido(datos) {
+    async loginFallido(datos, mensaje = null) {
         if (!datos) return this.sinDatos("La función loginFallido de la clase LoginModel no recibió datos.")
 
-        this.mensaje = "Credenciales incorrectas."
+        this.mensaje = mensaje || "Credenciales incorrectas."
 
         try {
             this.conexion = await this.db.getConnection()

@@ -33,7 +33,7 @@ const createApp = () => {
 	app.use((req, res) => res.status(404).send("<h1>404</h1><p>Resourse not found</p>"))
 
 	// Inicia el servidor
-	app.listen(PORT, HOST, () => console.log(`Servidor en linea: http://${HOST}:${PORT}`))
+	app.listen(PORT, HOST, () => console.log(`Servidor backend en linea: http://${HOST}:${PORT}`))
 }
 
 createApp()

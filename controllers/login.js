@@ -12,8 +12,9 @@ export class LoginController {
 
         const validacion = validaLogin(datos)
         if (validacion.error) {
+            const intento = await this.modelo.loginFallido(datos, { error: JSON.parse(validacion.error.message) })
             return res.status(400)
-                .json(await this.modelo.loginFallido(datos))
+                .json(intento)
         }
         
         const resultado = await this.modelo.login(validacion.data)
