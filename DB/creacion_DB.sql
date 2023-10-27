@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`bitacora_cambios` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `contabilidad`.`sesion` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `token` VARCHAR(45) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
     `id_usuario` INT NOT NULL,
     `creacion` TIMESTAMP NOT NULL DEFAULT NOW(),
     `vencimiento` TIMESTAMP NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 30 MINUTE)),
