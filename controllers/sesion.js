@@ -17,9 +17,9 @@ export class SesionContoller {
     async validaSesion(req, res) {
         const token = req.headers["token"]
         const validacion = validaToken({ token })
-        if (validacion.error) return res.status(401).send("<h1>401</h1><p>Recurso no autorizado.</p>")
+        if (validacion.error) return await res.status(401).send("<h1>401</h1><p>Recurso no autorizado.</p>")
 
         const resultado = await this.modelo.validaSesion(token)
-        if (!resultado.success) return res.status(401).send("<h1>401</h1><p>Se requiere inicio de sesión.</p>")
+        if (!resultado.success) return await res.status(401).send("<h1>401</h1><p>Se requiere inicio de sesión.</p>")
     }
 }
