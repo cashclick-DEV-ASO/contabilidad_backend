@@ -11,6 +11,4 @@ const configuracion = {
 
 const pool = mysql.createPool(configuracion)
 
-if (pool) console.log("Pool creado en el thread: ", pool.threadId)
-
 export default pool
