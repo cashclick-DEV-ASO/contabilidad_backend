@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`banco` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`layout` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `id_banco` INT NOT NULL,
-    `layout` JSON NOT NULL,
+    `layout` VARCHAR(1000) NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `bnk_l_idx` (`id_banco` ASC) VISIBLE,
     FOREIGN KEY (`id_banco`) REFERENCES `contabilidad`.`banco` (`id`)
@@ -199,8 +199,9 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`perfil` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`usuario` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `id_perfil` INT NOT NULL,
-    `usuario` VARCHAR(50) NOT NULL,
-    `credenciales` BLOB NOT NULL,
+    `usuario` VARCHAR(100) NOT NULL,
+    `nombre` VARCHAR(100) NOT NULL,
+    `password` BLOB NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `id_prf_idx` (`id_perfil` ASC) VISIBLE,
     FOREIGN KEY (`id_perfil`) REFERENCES `contabilidad`.`perfil` (`id`)
@@ -213,8 +214,8 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`bitacora_cambios` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `id_transaccion` INT NOT NULL,
     `id_usuario` INT NOT NULL,
-    `valor_antes` JSON NOT NULL,
-    `valor_despues` JSON NOT NULL,
+    `valor_antes` VARCHAR(1000) NOT NULL,
+    `valor_despues` VARCHAR(1000) NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `id_trb_idx` (`id_transaccion` ASC) VISIBLE,
     INDEX `id_usr_idx` (`id_usuario` ASC) VISIBLE,
@@ -253,6 +254,9 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`intento_acceso` (
     INDEX `id_idx` (`id` ASC) VISIBLE
 ) ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Registr `contabilidad`.`banco`
+-- -----------------------------------------------------
 INSERT INTO
     `contabilidad`.`banco` (Nombre, Nombre_Legal)
 VALUES
@@ -336,7 +340,14 @@ VALUES
     ("0123456789", 3, "Cuenta de prueba");
 
 INSERT INTO
-    `contabilidad`.`perfil` (nombre, banco, cuenta, transaccion, cuenta_contable, usuario)
+    `contabilidad`.`perfil` (
+        nombre,
+        banco,
+        cuenta,
+        transaccion,
+        cuenta_contable,
+        usuario
+    )
 VALUES
     ("dios", 1, 1, 1, 1, 1),
     ("director", 1, 1, 1, 1, 1),
@@ -345,16 +356,29 @@ VALUES
     ("ejecutivo", 0, 0, 0, 0, 0);
 
 INSERT INTO
-    `contabilidad`.`usuario` (id_perfil, usuario, credenciales)
+    `contabilidad`.`usuario` (id_perfil, usuario, nombre, PASSWORD)
 VALUES
     (
         1,
-        "alberto.so@cashclick.com",
-        AES_ENCRYPT("aqui yo soy dios", "PASS_KNT")
+        "alberto.soto@cashclick.mx",
+        "Alberto Soto Ortega",
+        AES_ENCRYPT("main_desarrollador", "save_pa$$")
+    ),
+    (
+        4,
+        "demo@capacitacion.com",
+        "Capacitacion",
+        AES_ENCRYPT("capacitacion_cashclick", "save_pa$$")
     ),
     (
         2,
-        "usuario1@temporal.com",
-        AES_ENCRYPT("pass temp", "PASS_KNT")
+        "director@cashclick.mx",
+        "Director",
+        AES_ENCRYPT("director_inicial", "save_pa$$")
+    ),
+    (
+        3,
+        "gerente@cashclick.mx",
+        "Gerente",
+        AES_ENCRYPT("gererente_inicial", "save_pa$$")
     );
-
