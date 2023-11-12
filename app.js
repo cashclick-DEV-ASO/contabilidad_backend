@@ -11,8 +11,9 @@ const createApp = () => {
 	if (!process.env.ORIGINS)
 		return console.error("No se han definido los origenes aceptados")
 
-	const HOST = process.env.HOST ?? "0.0.0.0"
-	const PORT = process.env.PORT ?? 0
+	const HOST = process.env.HOST ?? "127.0.0.1"
+	const PORT = process.env.PORT ?? null
+	const SRV_URL = `${HOST}${PORT ? `:${PORT}` : ""}`
 	const app = express()
 	const modelos = new Modelos()
 
@@ -44,8 +45,8 @@ const createApp = () => {
 	)
 
 	// Inicia el servidor
-	app.listen(PORT, HOST, () =>
-		console.log(`Servidor backend en linea en: http://${HOST}:${PORT}`)
+	app.listen(PORT, HOST.replace("http://", "").replace("https://", ""), () =>
+		console.log(`Servidor backend en linea en: ${SRV_URL}`)
 	)
 }
 
