@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`banco` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`layout` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `id_banco` INT NOT NULL,
+    `alias` VARCHAR(45) NULL,
     `layout` VARCHAR(1000) NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `bnk_l_idx` (`id_banco` ASC) VISIBLE,
