@@ -2,24 +2,49 @@ import { validaToken } from "../schemas/sesion.js"
 
 /**
  * @param {Modelos} modelos - Catalogo con los modelos a utilizar
-*/
+ */
 export class SesionContoller {
-    constructor(modelo) {
-        this.modelo = modelo
-    }
+	constructor(modelo) {
+		this.modelo = modelo
+	}
 
-    /**
-     * @param {Request} req - Objeto de tipo Request
-     * @param {Response} res - Objeto de tipo Response
-     * @returns {Response} Objeto de tipo Response
-     * @description Valida que el token de sesión sea válido
-     */
-    async validaSesion(req, res) {
-        const token = req.headers["token"]
-        const validacion = validaToken({ token })
-        if (validacion.error) return await res.status(401).send("<h1>401</h1><p>Recurso no autorizado.</p>")
+	/**
+	 * @param {Request} req - Objeto de tipo Request
+	 * @param {Response} res - Objeto de tipo Response
+	 * @returns {Response} Objeto de tipo Response
+	 * @description Valida que el token de sesión sea válido
+	 */
+	async validaSesion(req, res) {
+		const token =
+			req.headers["token"] ??
+			req.headers["authorization"] ??
+			req.cookies.TOKEN ??
+			""
 
-        const resultado = await this.modelo.validaSesion(token)
-        if (!resultado.success) return await res.status(401).send("<h1>401</h1><p>Se requiere inicio de sesión.</p>")
-    }
+		const validacion = validaToken({ token })
+		if (validacion.error) {
+			await res
+				.status(401)
+				.send(
+					this.modelo.responde(
+						{
+							mensaje: "El token no es valido.",
+							sesionCaducada: true,
+						},
+						`${new Date().toISOString()} - Se intento acceder con un token de formato diferente: ${token}`
+					)
+				)
+				.end()
+			return false
+		}
+
+		const resultado = await this.modelo.validaSesion(token)
+
+		if (!resultado.success) {
+			await res.status(401).send(resultado).end()
+			return false
+		}
+
+		return true
+	}
 }

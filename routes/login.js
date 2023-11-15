@@ -2,15 +2,16 @@ import { Router } from "express"
 import { LoginController } from "../controllers/login.js"
 
 /**
- * @param {Object} app - Express app
- * @param {Modelos} modelos - Catalogo con los modelos a utilizar
- * @returns {void} Router de login
+ * Define las rutas y controladores para el login.
+ * @param {Object} app - Objeto de la aplicación Express.
+ * @param {Object} modelos - Objeto con los modelos de la base de datos.
+ * @returns {void}
  */
 export const loginRouter = (app, modelos) => {
-    const enrutador = Router()
-    const controlador = new LoginController(modelos.login)
+	const enrutador = Router()
+	const controlador = new LoginController(modelos.login)
 
-    enrutador.post("/", controlador.login)
+	enrutador.post("/", controlador.login)
 
-    app.use("/login", enrutador)
+	app.use("/login", enrutador)
 }

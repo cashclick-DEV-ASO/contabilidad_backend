@@ -1,15 +1,17 @@
 import express, { json } from "express"
 import { configuracionCORS } from "./middlewares/cors.js"
 import { validaSesion } from "./middlewares/sesion.js"
+import cookieParser from "cookie-parser"
 import "dotenv/config"
 
 import { Modelos } from "./models/modelos.js"
 import { loginRouter } from "./routes/login.js"
 import { edoCtaRouter } from "./routes/edoCta.js"
+import { noConfig } from "./routes/noConfig.js"
 
 const createApp = () => {
 	if (!process.env.ORIGINS)
-		return console.error("No se han definido los origenes aceptados")
+		return console.error("No se han definido los orígenes aceptados")
 
 	const HOST = process.env.HOST ?? "127.0.0.1"
 	const PORT = process.env.PORT ?? null
@@ -19,13 +21,16 @@ const createApp = () => {
 
 	// Middlewares
 	app.use(json())
+	app.use(cookieParser())
 	app.use(configuracionCORS())
+	app.options("*", configuracionCORS())
 	app.use(validaSesion(modelos))
 	app.disable("x-powered-by")
 
 	// Rutas
 	loginRouter(app, modelos)
 	edoCtaRouter(app, modelos)
+	noConfig(app, modelos)
 
 	app.get("/status", (req, res) =>
 		res.status(200).json({ status: "OK", message: "Servidor en linea" })
