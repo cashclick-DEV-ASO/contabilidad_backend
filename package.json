@@ -6,7 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"start": "node app.js",
-		"start:dev": "node --watch app.js"
+		"start:dev": "node --watch app.js",
+		"actualizar": "git pull"
 	},
 	"keywords": [],
 	"author": "Alberto Soto Ortega",
