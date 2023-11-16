@@ -8,7 +8,6 @@ import { SesionContoller } from "../controllers/sesion.js"
 export const validaSesion = modelos => {
 	const listaBlanca = ["/login", "/status"]
 	const controlador = new SesionContoller(modelos.sesion)
-
 	// Regresa una función que valida la sesión
 	return async (req, res, next) => {
 		if (listaBlanca.includes(req.path)) return next()

@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`layout` (
     `id_banco` int NOT NULL,
     `alias` varchar(45) DEFAULT NULL,
     `extensiones` varchar(50) DEFAULT NULL,
+    `tipo` varchar(45) DEFAULT NULL,
     `layout` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `bnk_l_idx` (`id_banco` ASC) VISIBLE,
@@ -299,25 +300,28 @@ VALUES
 -- Registros para la tabla `contabilidad`.`layout`
 -- -----------------------------------------------------
 INSERT INTO
-    `contabilidad`.`layout` (id_banco, alias, extensiones, layout)
+    `contabilidad`.`layout` (id_banco, alias, tipo, extensiones, layout)
 VALUES
     (
         1,
         "Cobranza BBVA",
+        "fijo",
         "txt,exp",
-        '{"tipo":"ancho","apertura":{"idRegistro":1,"campos":{"No_Cta":{"inicio":3,"espacios":16,"tipo":"number"},"Titular":{"inicio":51,"espacios":23,"tipo":"string"},"Fecha_Operación":{"inicio":20,"espacios":6,"tipo":"date"},"Fecha_Emisión":{"inicio":26,"espacios":6,"tipo":"date"},"Saldo_Inicial":{"inicio":33,"espacios":14,"tipo":"decimal"}}},"registros":{"idRegistro":2,"tandem":{"movimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Fecha_Operación":{"inicio":10,"espacios":6,"tipo":"date"},"Fecha_Valor":{"inicio":16,"espacios":6,"tipo":"date"},"Id_Operación":{"inicio":24,"espacios":3,"tipo":"string"},"Tipo_Movimiento":{"inicio":27,"espacios":1,"tipo":"number"},"Monto":{"inicio":28,"espacios":14,"tipo":"decimal"},"Descripción_1":{"inicio":52,"espacios":28,"tipo":"string"},"Descripción_2":{"inicio":85,"espacios":30,"tipo":"string"},"Descripción_3":{"inicio":122,"espacios":38,"tipo":"string"}}},"cierre":{"idRegistro":3,"tandem":{"idMovimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Saldo_Final":{"inicio":137,"espacios":14,"tipo":"decimal"},"Total_Cargos":{"inicio":103,"espacios":14,"tipo":"decimal"},"Total_Abonos":{"inicio":122,"espacios":14,"tipo":"decimal"},"No_Cargos":{"inicio":98,"espacios":5,"tipo":"number"},"No_Abonos":{"inicio":117,"espacios":5,"tipo":"number"}}}}'
+        '{"apertura":{"idRegistro":1,"campos":{"No_Cta":{"inicio":3,"espacios":16,"tipo":"number"},"Titular":{"inicio":51,"espacios":23,"tipo":"string"},"Fecha_Operación":{"inicio":20,"espacios":6,"tipo":"date"},"Fecha_Emisión":{"inicio":26,"espacios":6,"tipo":"date"},"Saldo_Inicial":{"inicio":33,"espacios":14,"tipo":"decimal"}}},"registros":{"idRegistro":2,"tandem":{"movimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Fecha_Operación":{"inicio":10,"espacios":6,"tipo":"date"},"Fecha_Valor":{"inicio":16,"espacios":6,"tipo":"date"},"Id_Operación":{"inicio":24,"espacios":3,"tipo":"string"},"Tipo_Movimiento":{"inicio":27,"espacios":1,"tipo":"number"},"Monto":{"inicio":28,"espacios":14,"tipo":"decimal"},"Descripción_1":{"inicio":52,"espacios":28,"tipo":"string"},"Descripción_2":{"inicio":85,"espacios":30,"tipo":"string"},"Descripción_3":{"inicio":122,"espacios":38,"tipo":"string"}}},"cierre":{"idRegistro":3,"tandem":{"idMovimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Saldo_Final":{"inicio":137,"espacios":14,"tipo":"decimal"},"Total_Cargos":{"inicio":103,"espacios":14,"tipo":"decimal"},"Total_Abonos":{"inicio":122,"espacios":14,"tipo":"decimal"},"No_Cargos":{"inicio":98,"espacios":5,"tipo":"number"},"No_Abonos":{"inicio":117,"espacios":5,"tipo":"number"}}}}'
     ),
     (
         1,
         "Dispersion BBVA",
+        "delimitado",
         "csv,exp",
-        '{"tipo":"ancho","apertura":{"idRegistro":1,"campos":{"No_Cta":{"inicio":3,"espacios":16,"tipo":"number"},"Titular":{"inicio":51,"espacios":23,"tipo":"string"},"Fecha_Operación":{"inicio":20,"espacios":6,"tipo":"date"},"Fecha_Emisión":{"inicio":26,"espacios":6,"tipo":"date"},"Saldo_Inicial":{"inicio":33,"espacios":14,"tipo":"decimal"}}},"registros":{"idRegistro":2,"tandem":{"movimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Fecha_Operación":{"inicio":10,"espacios":6,"tipo":"date"},"Fecha_Valor":{"inicio":16,"espacios":6,"tipo":"date"},"Id_Operación":{"inicio":24,"espacios":3,"tipo":"string"},"Tipo_Movimiento":{"inicio":27,"espacios":1,"tipo":"number"},"Monto":{"inicio":28,"espacios":14,"tipo":"decimal"},"Descripción_1":{"inicio":52,"espacios":28,"tipo":"string"},"Descripción_2":{"inicio":85,"espacios":30,"tipo":"string"},"Descripción_3":{"inicio":122,"espacios":38,"tipo":"string"}}},"cierre":{"idRegistro":3,"tandem":{"idMovimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Saldo_Final":{"inicio":137,"espacios":14,"tipo":"decimal"},"Total_Cargos":{"inicio":103,"espacios":14,"tipo":"decimal"},"Total_Abonos":{"inicio":122,"espacios":14,"tipo":"decimal"},"No_Cargos":{"inicio":98,"espacios":5,"tipo":"number"},"No_Abonos":{"inicio":117,"espacios":5,"tipo":"number"}}}}'
+        '{"apertura":{"idRegistro":1,"campos":{"No_Cta":{"inicio":3,"espacios":16,"tipo":"number"},"Titular":{"inicio":51,"espacios":23,"tipo":"string"},"Fecha_Operación":{"inicio":20,"espacios":6,"tipo":"date"},"Fecha_Emisión":{"inicio":26,"espacios":6,"tipo":"date"},"Saldo_Inicial":{"inicio":33,"espacios":14,"tipo":"decimal"}}},"registros":{"idRegistro":2,"tandem":{"movimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Fecha_Operación":{"inicio":10,"espacios":6,"tipo":"date"},"Fecha_Valor":{"inicio":16,"espacios":6,"tipo":"date"},"Id_Operación":{"inicio":24,"espacios":3,"tipo":"string"},"Tipo_Movimiento":{"inicio":27,"espacios":1,"tipo":"number"},"Monto":{"inicio":28,"espacios":14,"tipo":"decimal"},"Descripción_1":{"inicio":52,"espacios":28,"tipo":"string"},"Descripción_2":{"inicio":85,"espacios":30,"tipo":"string"},"Descripción_3":{"inicio":122,"espacios":38,"tipo":"string"}}},"cierre":{"idRegistro":3,"tandem":{"idMovimiento":2,"detalle":3,"inicio":1,"espacios":1},"campos":{"Saldo_Final":{"inicio":137,"espacios":14,"tipo":"decimal"},"Total_Cargos":{"inicio":103,"espacios":14,"tipo":"decimal"},"Total_Abonos":{"inicio":122,"espacios":14,"tipo":"decimal"},"No_Cargos":{"inicio":98,"espacios":5,"tipo":"number"},"No_Abonos":{"inicio":117,"espacios":5,"tipo":"number"}}}}'
     ),
     (
         3,
         "Cobranza STP",
+        "excel",
         "csv,xslx",
-        ""
+        '{"encabezados":5, "columnas": [{"nombre":"Fecha_Operación","tipo":"date"},{"nombre":"Fecha_Valor","tipo":"date"},{"nombre":"Id_Operación","tipo":"string"},{"nombre":"Tipo_Movimiento","tipo":"number"},{"nombre":"Monto","tipo":"decimal"},{"nombre":"Descripción_1","tipo":"string"},{"nombre":"Descripción_2","tipo":"string"},{"nombre":"Descripción_3","tipo":"string"}]}'
     );
 
 -- -----------------------------------------------------
