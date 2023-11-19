@@ -738,11 +738,11 @@ VALUES
         2,
         "director@cashclick.mx",
         "Director",
-        AES_ENCRYPT("director_inicial", "save_pa$$")
+        AES_ENCRYPT("director01_inicial", "save_pa$$")
     ),
     (
         3,
         "gerente@cashclick.mx",
         "Gerente",
-        AES_ENCRYPT("gererente_inicial", "save_pa$$")
+        AES_ENCRYPT("gerente01_inicial", "save_pa$$")
     );
