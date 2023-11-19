@@ -35,6 +35,7 @@ export class LoginModel extends Modelo {
 			}
 
 			const [mapa] = await this.conexion.query(qryMapa, resultado[0].id_perfil)
+
 			const mapaJSON = this.construirMapa(mapa)
 			if (!mapaJSON) throw new Error("Ocurrió un error al construir el mapa.")
 
@@ -109,9 +110,7 @@ export class LoginModel extends Modelo {
 	}
 
 	compararTextos(texto1, texto2) {
-		if (texto1 == null || texto2 == null) {
-			return texto1 == texto2
-		}
+		if (texto1 == null || texto2 == null) return texto1 == texto2
 
 		const normalizar = texto =>
 			texto
