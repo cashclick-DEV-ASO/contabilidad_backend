@@ -19,19 +19,23 @@ export class LoginController {
 		}
 
 		const resultado = await this.modelo.login(validacion.data)
-		if (resultado.success) return res.status(200).json(resultado)
+		if (resultado.success) {
+			res.cookie("TOKEN", resultado.informacion.token, {
+				httpOnly: true,
+				maxAge: 1000 * 60 * 60 * 24 * 30,
+				sameSite: "None",
+				secure: true,
+			})
+			return res.status(200).json(resultado)
+		}
 
 		return res
-			.status(
-				resultado.informacion?.mensaje == "Credenciales incorrectas."
-					? 400
-					: 500
-			)
+			.status(resultado.informacion?.mensaje == "Credenciales incorrectas." ? 400 : 500)
 			.json(resultado)
 	}
 
 	logout = async (req, res) => {
-		const token = req.headers["token"]
+		const token = req.headers["token"] ?? req.cookies.TOKEN ?? ""
 		const resultado = await this.modelo.logout(token)
 		if (resultado.success) return res.status(200).json(resultado)
 
