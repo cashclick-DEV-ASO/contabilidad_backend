@@ -18,9 +18,13 @@ export class SesionContoller {
 		const token =
 			req.cookies.TOKEN ?? req.headers["token"] ?? req.headers["authorization"] ?? ""
 
+		console.log("Cookies: ", req.cookies.TOKEN)
+		console.log("Headers: ", req.headers["token"])
+		console.log("Headers: ", req.headers["authorization"])
+		console.log("Utilizado: ", token)
 		const validacion = validaToken({ token })
 		if (validacion.error) {
-			console.log(validacion)
+			console.log(validacion.error)
 			await res
 				.status(401)
 				.send(
