@@ -20,6 +20,7 @@ export class SesionContoller {
 
 		const validacion = validaToken({ token })
 		if (validacion.error) {
+			console.log(validacion)
 			await res
 				.status(401)
 				.send(
