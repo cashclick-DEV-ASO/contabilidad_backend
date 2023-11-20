@@ -20,13 +20,15 @@ export class LoginController {
 
 		const resultado = await this.modelo.login(validacion.data)
 		if (resultado.success) {
-			res.cookie("TOKEN", resultado.informacion.token, {
-				httpOnly: true,
-				maxAge: 1000 * 60 * 60 * 24 * 30,
-				sameSite: "None",
-				secure: true,
-			})
-			return res.status(200).json(resultado)
+			return res
+				.cookie("TOKEN", resultado.informacion.token, {
+					httpOnly: true,
+					maxAge: 1000 * 60 * 60 * 24 * 30,
+					sameSite: "None",
+					secure: true,
+				})
+				.status(200)
+				.json(resultado)
 		}
 
 		return res
