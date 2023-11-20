@@ -16,10 +16,7 @@ export class SesionContoller {
 	 */
 	async validaSesion(req, res) {
 		const token =
-			req.headers["token"] ??
-			req.headers["authorization"] ??
-			req.cookies.TOKEN ??
-			""
+			req.cookies.TOKEN ?? req.headers["token"] ?? req.headers["authorization"] ?? ""
 
 		const validacion = validaToken({ token })
 		if (validacion.error) {
