@@ -1,43 +1,35 @@
 export class Modelo {
     constructor(db) {
-        this.db = db;
-    }
-
-    conexion = null
-    error = null
-    mensaje = null
-    token = null
-
-    /**
-     * @param {object} informacion - Información que se enviará como respuesta
-     * @param {object} error - Error que se mostrara en consola
-     * @param {boolean} mostrarError - Indica si se mostrará el error en consola
-     * @returns {object} Objeto JSON para enviar como respuesta
-    */
-    responde(informacion, error = null, mostrarError = true) {
-        const resultado = {};
-        resultado.success = true;
-        resultado.informacion = informacion;
-
-        if (error) {
-            resultado.success = false;
-            mostrarError && console.log(error);
-        }
-        
-        this.limpiar();
-        return resultado;
+        this.db = db
     }
 
     /**
-     * @param {string} mensaje - Mensaje que se mostrará en la consola
+     * Responde a una solicitud con un objeto de respuesta estructurado.
+     * @param {boolean} success - Indica si la solicitud fue exitosa o no.
+     * @param {string} mensaje - El mensaje de respuesta.
+     * @param {any} [datos=null] - Los datos de respuesta opcionales.
+     * @param {any} [errores=null] - Los errores de respuesta opcionales.
+     * @returns {object} - El objeto de respuesta estructurado.
      */
-    sinDatos(mensaje = "") {
-        return responde(
-            { mensaje: "No se proporcionaron datos a procesar." },
-            {
-                fecha: new Date(),
-                mensaje
-            });
+    respuesta(success, mensaje, datos = null, errores = null, sesionCaducada = null) {
+        const res = {}
+
+        res.success = success
+        res.mensaje = mensaje
+
+        if (datos !== null) {
+            if (Array.isArray(datos)) res.datos = datos
+            else res.datos = [datos]
+        }
+
+        if (errores !== null) {
+            if (Array.isArray(errores)) res.errores = errores
+            else res.errores = [errores]
+        }
+
+        if (sesionCaducada !== null) res.sesionCaducada = sesionCaducada
+
+        return res
     }
 
     /**
@@ -47,14 +39,7 @@ export class Modelo {
      * @example fechaMySQL("25/10/2021") // "2021-10-25 00:00:00"
      */
     fechaMySQL(fecha) {
-        const fechaISO = new Date(fecha).toISOString();
-        return fechaISO.slice(0, 10) + " " + fechaISO.slice(11, 19);
-    }
-
-    limpiar() {
-        this.conexion = null
-        this.error = null
-        this.mensaje = null
-        this.token = null
+        const fechaISO = new Date(fecha).toISOString()
+        return fechaISO.slice(0, 10) + " " + fechaISO.slice(11, 19)
     }
 }

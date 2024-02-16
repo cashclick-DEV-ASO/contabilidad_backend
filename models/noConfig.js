@@ -1,48 +1,51 @@
 import { Modelo } from "./modelo.js"
 
 export class NoConfigModelo extends Modelo {
-	constructor(db) {
-		super(db)
-	}
+    constructor(db) {
+        super(db)
+    }
 
-	async post(datos) {
-		if (!datos)
-			return this.responde({ mensaje: "No se recibieron datos." }, true)
+    async post(datos) {
+        let conexion = null
+        let mensaje = "Consulta ejecutada correctamente."
+        let error = null
+        let resultado = null
 
-		this.mensaje = "Consulta ejecutada correctamente."
+        if (!datos)
+            return console.log("La función post de la clase NoConfigModelo, no recibió datos.")
 
-		let resultado = null
+        try {
+            conexion = await this.db.getConnection()
+            const { query, parametros } = datos
+            resultado = await conexion.query(query, parametros ?? [])
+            resultado = resultado[0] ?? []
+        } catch (e) {
+            console.log(e)
+            error = e
+            mensaje = "Error al ejecutar la consulta."
+        } finally {
+            if (conexion) conexion.release()
+        }
 
-		try {
-			this.conexion = await this.db.getConnection()
-			const { query, parametros } = datos
-			resultado = await this.conexion.query(query, parametros ?? [])
-			resultado = resultado[0] ?? []
-		} catch (error) {
-			this.error = error
-			this.mensaje = "Error al ejecutar la consulta."
-		} finally {
-			if (this.conexion) this.conexion.release()
-		}
+        return this.respuesta(error === null, mensaje, resultado, error)
+    }
 
-		return this.responde({ mensaje: this.mensaje, resultado }, this.error)
-	}
+    async get(qry) {
+        let conexion = null
+        let mensaje = "Consulta ejecutada correctamente."
+        let error = null
+        let resultado = null
 
-	async get(qry) {
-		this.mensaje = "Consulta ejecutada correctamente."
+        try {
+            conexion = await this.db.getConnection()
+            resultado = await this.get(qry)
+        } catch (error) {
+            error = e
+            mensaje = "Error al ejecutar la consulta."
+        } finally {
+            if (conexion) conexion.release()
+        }
 
-		let resultado = null
-
-		try {
-			this.conexion = await this.db.getConnection()
-			resultado = await this.get(qry)
-		} catch (error) {
-			this.error = e
-			this.mensaje = "Error al ejecutar la consulta."
-		} finally {
-			if (this.conexion) this.conexion.release()
-		}
-
-		return this.responde({ mensaje: this.mensaje, resultado }, this.error)
-	}
+        return this.respuesta(error === null, mensaje, { resultado }, error)
+    }
 }

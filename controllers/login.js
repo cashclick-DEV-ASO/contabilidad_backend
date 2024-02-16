@@ -12,18 +12,16 @@ export class LoginController {
 
 		const validacion = validaLogin(datos)
 		if (validacion.error) {
-			const intento = await this.modelo.loginFallido(datos, {
-				error: JSON.parse(validacion.error.message),
-			})
+			const intento = await this.modelo.errorFormato()
 			return res.status(400).json(intento)
 		}
 
 		const resultado = await this.modelo.login(validacion.data)
 		if (resultado.success) {
 			return res
-				.cookie("TOKEN", resultado.informacion.token, {
+				.cookie("TOKEN", resultado.datos[0].token, {
 					httpOnly: true,
-					maxAge: 1000 * 60 * 60 * 24 * 30,
+					maxAge: 1000 * 60 * 30,
 					sameSite: "None",
 					secure: true,
 				})

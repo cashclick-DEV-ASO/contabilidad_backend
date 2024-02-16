@@ -1,125 +1,109 @@
 import { Modelo } from "./modelo.js"
 import crypto from "node:crypto"
+import mapaJSON from "../schemas/mapaNavegacion.js"
 
 const qryLogin = `SELECT * FROM usuario WHERE usuario = ? AND cast(aes_decrypt(password, '${process.env.DB_SECRET_KEY_PASS}') AS char) = ?`
 const qrySesion = "INSERT INTO sesion (id_usuario, token) VALUES (?, ?)"
-const qryLoginFallido = "INSERT INTO intento_acceso (usuario, pass, ip, host) VALUES (?, ?, ?, ?)"
 const qryMapa =
-	"SELECT m.* FROM mapa_navegacion_frontend m WHERE m.id IN (SELECT pf.id_mapa FROM permiso_frontend pf WHERE pf.id_perfil = ?) OR m.permanente = 1 ORDER BY padre, orden;"
+    "SELECT m.* FROM mapa_navegacion_frontend m WHERE m.id IN (SELECT pf.id_mapa FROM permiso_frontend pf WHERE pf.id_perfil = ?) OR m.permanente = 1 ORDER BY padre, orden;"
 
 export class LoginModel extends Modelo {
-	constructor(db) {
-		super(db)
-	}
+    constructor(db) {
+        super(db)
+    }
 
-	async login(datos) {
-		if (!datos)
-			return this.sinDatos("La función login de la clase LoginModel no recibió datos.")
+    async errorFormato() {
+        return this.respuesta(
+            false,
+            "Error en formato de los datos enviados.",
+            "Credenciales incorrectas"
+        )
+    }
 
-		this.mensaje = "Sesión iniciada."
+    async login(datos) {
+        if (!datos) return console.log("La función login de la clase LoginModel no recibió datos.")
 
-		try {
-			this.conexion = await this.db.getConnection()
-			await this.conexion.beginTransaction()
-			const [resultado] = await this.conexion.query(qryLogin, [datos.user, datos.pass])
-			if (resultado.length == 0) return await this.loginFallido(datos)
+        let mensaje = "Sesión iniciada."
+        let success = true
+        let error = null
+        let token = null
+        let nombre = null
+        let mapaFront = null
+        let conexion = null
 
-			this.token = crypto.randomUUID()
-			this.nombre = resultado[0].nombre
-			const usuario = resultado[0].id
-			const [resultadoSesion] = await this.conexion.query(qrySesion, [usuario, this.token])
+        try {
+            conexion = await this.db.getConnection()
+            await conexion.beginTransaction()
 
-			if (resultadoSesion.affectedRows == 0) {
-				this.token = null
-				throw new Error("No se creo la sesión.")
-			}
+            const [resultado] = await conexion.query(qryLogin, [datos.user, datos.pass])
+            if (resultado.length == 0) throw new Error("Credenciales incorrectas.")
 
-			const [mapa] = await this.conexion.query(qryMapa, resultado[0].id_perfil)
+            token = crypto.randomUUID()
+            nombre = resultado[0].nombre
+            const usuario = resultado[0].id
+            const [resultadoSesion] = await conexion.query(qrySesion, [usuario, token])
 
-			const mapaJSON = this.construirMapa(mapa)
-			if (!mapaJSON) throw new Error("Ocurrió un error al construir el mapa.")
+            if (resultadoSesion.affectedRows == 0) {
+                token = null
+                throw new Error("No se logro registrar la sesión.")
+            }
 
-			this.mapa = JSON.stringify(mapaJSON)
+            // const [mapa] = await conexion.query(qryMapa, resultado[0].id_perfil)
+            // const mapaJSON = this.construirMapa(mapa)
+            // if (!mapaJSON) throw new Error("Ocurrió un error al construir el mapa.")
+            mapaFront = JSON.stringify(mapaJSON)
 
-			await this.conexion.commit()
-		} catch (e) {
-			if (this.conexion) await this.conexion.rollback()
-			this.error = e
-			this.mensaje = "Error al autenticar al usuario."
-		} finally {
-			if (this.conexion) this.conexion.release()
-		}
+            await conexion.commit()
+        } catch (e) {
+            if (conexion) await conexion.rollback()
+            success = false
+            error = e.message
+            mensaje = "Error al autenticar al usuario."
+        } finally {
+            if (conexion) conexion.release()
+        }
 
-		return this.responde(
-			{
-				mensaje: this.mensaje,
-				token: this.token,
-				nombre: this.nombre,
-				mapa: this.mapa,
-			},
-			this.error
-		)
-	}
+        return this.respuesta(
+            success,
+            mensaje,
+            !token
+                ? null
+                : {
+                      token,
+                      nombre,
+                      mapa: mapaFront
+                  },
+            error
+        )
+    }
 
-	async loginFallido(datos, mensaje = null) {
-		if (!datos)
-			return this.sinDatos("La función loginFallido de la clase LoginModel no recibió datos.")
+    construirMapa(registros, padre = "") {
+        const resultado = {}
 
-		this.mensaje = mensaje || "Credenciales incorrectas."
+        registros.forEach((registro) => {
+            const padreR = registro.padre ?? ""
+            if (this.compararTextos(padreR, padre)) {
+                resultado[registro.grupo] = {
+                    titulo: registro.titulo,
+                    vista: registro.vista ?? this.construirMapa(registros, registro.grupo)
+                }
+            }
+        })
+        return resultado
+    }
 
-		try {
-			this.conexion = await this.db.getConnection()
-			await this.conexion.beginTransaction()
-			const [resultado] = await this.conexion.query(qryLoginFallido, [
-				datos.user,
-				datos.pass,
-				datos.ip,
-				datos.host,
-			])
-			if (resultado.length == 0)
-				throw new Error({
-					error: "No se inserto el intento de acceso.",
-					datos,
-				})
-			await this.conexion.commit()
-			this.error = { mensaje: "Intento de acceso fallido." }
-		} catch (e) {
-			if (this.conexion) this.conexion.rollback()
-			this.error = e
-		} finally {
-			if (this.conexion) this.conexion.release()
-		}
+    compararTextos(texto1, texto2) {
+        if (texto1 == null || texto2 == null) return texto1 == texto2
 
-		return this.responde({ mensaje: this.mensaje }, this.error)
-	}
-
-	construirMapa(registros, padre = "") {
-		const resultado = {}
-
-		registros.forEach(registro => {
-			const padreR = registro.padre ?? ""
-			if (this.compararTextos(padreR, padre)) {
-				resultado[registro.grupo] = {
-					titulo: registro.titulo,
-					vista: registro.vista ?? this.construirMapa(registros, registro.grupo),
-				}
-			}
-		})
-
-		return resultado
-	}
-
-	compararTextos(texto1, texto2) {
-		if (texto1 == null || texto2 == null) return texto1 == texto2
-
-		const normalizar = texto =>
-			texto
-				.toLowerCase()
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "") // quita las marcas diacríticas
-				.replace(/_/g, "")
-				.replace(/ /g, "")
-
-		return normalizar(texto1) === normalizar(texto2)
-	}
+        const normalizar = (texto) =>
+            texto
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(" ", "")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/_/g, "")
+                .replace(/ /g, "")
+        console.log(texto1, texto2, normalizar(texto1), normalizar(texto2))
+        return normalizar(texto1) === normalizar(texto2)
+    }
 }

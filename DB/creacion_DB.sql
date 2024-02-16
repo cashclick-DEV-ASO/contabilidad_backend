@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`cuenta_bancaria` (
 CREATE TABLE IF NOT EXISTS `contabilidad`.`edo_cta` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `periodo` INT NOT NULL,
-    `archivo` VARCHAR(45) NOT NULL,
+    `archivo` VARCHAR(200) NOT NULL,
     `fecha_captura` TIMESTAMP NOT NULL DEFAULT NOW(),
     `id_cuenta` INT NOT NULL,
     PRIMARY KEY (`id`),
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`transaccion_mambu` (
 -- Table `contabilidad`.`transaccion_dwh`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `contabilidad`.`transaccion_dwh` (
-    `id` INT NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `fecha_creacion` TIMESTAMP NOT NULL DEFAULT NOW(),
     `fecha_valor` TIMESTAMP NOT NULL DEFAULT NOW(),
     `cliente` BIGINT(15) NOT NULL,
@@ -281,6 +281,18 @@ CREATE TABLE IF NOT EXISTS `contabilidad`.`intento_acceso` (
 ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Table `contabilidad`.`intento_acceso`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `contabilidad`.`saldo_contable` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `fecha` DATE NOT NULL,
+    `saldo_inicial` DECIMAL NOT NULL,
+    `saldo_final` DECIMAL NOT NULL,
+    `id_cta_contable` DOUBLE NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+-- -----------------------------------------------------
 -- Registros para la tabla `contabilidad`.`banco`
 -- -----------------------------------------------------
 INSERT INTO
@@ -331,8 +343,8 @@ INSERT INTO
     `contabilidad`.`cuenta_bancaria` (cta, id_banco, comentarios)
 VALUES
     ("0123456789", 1, "Cuenta de prueba"),
-    ("0123456789", 2, "Cuenta de prueba"),
-    ("0123456789", 3, "Cuenta de prueba");
+    ("1234567890", 2, "Cuenta de prueba"),
+    ("2345678901", 3, "Cuenta de prueba");
 
 -- -----------------------------------------------------
 -- Registros para la tabla `contabilidad`.`mapa_navegacion_frontend`
@@ -746,3 +758,8 @@ VALUES
         "Gerente",
         AES_ENCRYPT("gerente01_inicial", "save_pa$$")
     );
+
+INSERT INTO
+    `contabilidad`.`cuenta_contable` (`cta`, `concepto`, `jerarquia`)
+VALUES
+    ("0123456789", "Creditos", "1");
