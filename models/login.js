@@ -48,9 +48,6 @@ export class LoginModel extends Modelo {
                 throw new Error("No se logro registrar la sesión.")
             }
 
-            // const [mapa] = await conexion.query(qryMapa, resultado[0].id_perfil)
-            // const mapaJSON = this.construirMapa(mapa)
-            // if (!mapaJSON) throw new Error("Ocurrió un error al construir el mapa.")
             mapaFront = JSON.stringify(mapaJSON)
 
             await conexion.commit()
