@@ -49,7 +49,13 @@ const mapaJSON = {
             recalculoInteres: { titulo: "Recalculo de Interés", vista: "RecalculoInteres" },
             recalculoCapital: { titulo: "Recalculo de Capital", vista: "RecalculoCapital" },
             cartera: { titulo: "Cartera", vista: "Cartera" },
-            aclaraciones: { titulo: "Aclaraciones", vista: "Aclaraciones" },
+            aclaraciones: {
+                titulo: "Aclaraciones",
+                vista: {
+                    registro: { titulo: "Registro", vista: "RegAclaraciones" },
+                    consulta: { titulo: "Consulta", vista: "ConAclaraciones" }
+                }
+            },
             ajustes: { titulo: "Ajustes", vista: "Ajustes" },
             edoCta: { titulo: "Estado de Cuenta", vista: "EdoCta" }
         }
