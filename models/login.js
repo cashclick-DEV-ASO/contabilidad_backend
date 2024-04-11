@@ -103,4 +103,19 @@ export class LoginModel extends Modelo {
         console.log(texto1, texto2, normalizar(texto1), normalizar(texto2))
         return normalizar(texto1) === normalizar(texto2)
     }
+
+    async validaCaptcha(token) {
+        const url = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.G_SECRET_KEY}&response=${token}`
+        const res = await fetch(url, { method: "GET" })
+        const resultado = await res.json()
+        if (resultado.success && resultado.score > 0.5)
+            return this.respuesta(true, "Captcha correcto.", resultado)
+
+        return this.respuesta(
+            true,
+            resultado.success ? "Captcha incorrecto." : "Error de captcha.",
+            resultado,
+            { score: resultado.score, captcha: resultado.success }
+        )
+    }
 }
