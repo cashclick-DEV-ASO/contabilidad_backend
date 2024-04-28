@@ -32,6 +32,12 @@ export class LoginController {
                     sameSite: "None",
                     secure: true
                 })
+                .cookie("PERFIL", resultado.datos[0].perfil, {
+                    httpOnly: true,
+                    maxAge: 1000 * 60 * 30,
+                    sameSite: "None",
+                    secure: true
+                })
                 .status(200)
                 .json(resultado)
         }

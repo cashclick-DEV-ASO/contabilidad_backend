@@ -84,7 +84,13 @@ const mapaJSON = {
                     Etiquetas: { titulo: "Etiquetas", vista: "Etiquetas" }
                 }
             },
-            variables: { titulo: "Variables", vista: "Variables" }
+            usuarios: {
+                titulo: "Usuarios",
+                vista: {
+                    registro: { titulo: "Registro", vista: "RegUsuarios" },
+                    consulta: { titulo: "Consulta", vista: "ConUsuarios" }
+                }
+            }
         }
     },
     logout: { titulo: "Salir", vista: "Logout" }

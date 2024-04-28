@@ -30,6 +30,7 @@ export class LoginModel extends Modelo {
         let nombre = null
         let mapaFront = null
         let conexion = null
+        let perfil = 0
 
         try {
             conexion = await this.db.getConnection()
@@ -40,6 +41,7 @@ export class LoginModel extends Modelo {
 
             token = crypto.randomUUID()
             nombre = resultado[0].nombre
+            perfil = resultado[0].id_perfil
             const usuario = resultado[0].id
             const [resultadoSesion] = await conexion.query(qrySesion, [usuario, token])
 
@@ -68,6 +70,7 @@ export class LoginModel extends Modelo {
                 : {
                       token,
                       nombre,
+                      perfil,
                       mapa: mapaFront
                   },
             error
