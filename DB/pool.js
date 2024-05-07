@@ -11,4 +11,8 @@ const configuracion = {
 
 const pool = mysql.createPool(configuracion)
 
+pool.on("error", (err) => {
+    console.log(err)
+})
+
 export default pool

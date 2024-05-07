@@ -70,13 +70,13 @@ const mapaJSON = {
                     consulta: { titulo: "Consulta", vista: "ConCtasBancarias" }
                 }
             },
-            cuentasContables: {
-                titulo: "Cuentas Contables",
-                vista: {
-                    registro: { titulo: "Registro", vista: "RegCtasContables" },
-                    consulta: { titulo: "Consulta", vista: "ConCtasContables" }
-                }
-            },
+            // cuentasContables: {
+            //     titulo: "Cuentas Contables",
+            //     vista: {
+            //         registro: { titulo: "Registro", vista: "RegCtasContables" },
+            //         consulta: { titulo: "Consulta", vista: "ConCtasContables" }
+            //     }
+            // },
             plantillas: {
                 titulo: "Plantillas",
                 vista: {

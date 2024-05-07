@@ -16,15 +16,21 @@ export class NoConfigModelo extends Modelo {
 
         try {
             conexion = await this.db.getConnection()
+
+            conexion.beginTransaction()
             const { query, parametros } = datos
             resultado = await conexion.query(query, parametros ?? [])
             resultado = resultado[0] ?? []
+            conexion.commit()
         } catch (e) {
             console.log(e)
             error = e
             mensaje = "Error al ejecutar la consulta."
         } finally {
-            if (conexion) conexion.release()
+            if (conexion) {
+                if (error) conexion.rollback()
+                conexion.release()
+            }
         }
 
         return this.respuesta(error === null, mensaje, resultado, error)
