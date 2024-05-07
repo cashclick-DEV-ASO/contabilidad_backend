@@ -40,7 +40,7 @@ export class LoginModel extends Modelo {
             if (resultado.length == 0) throw new Error("Credenciales incorrectas.")
 
             token = crypto.randomUUID()
-            nombre = resultado[0].nombre
+            nombre = this.getNombreCompleto(resultado[0])
             perfil = resultado[0].id_perfil
             const usuario = resultado[0].id
             const [resultadoSesion] = await conexion.query(qrySesion, [usuario, token])
@@ -120,5 +120,16 @@ export class LoginModel extends Modelo {
             resultado,
             { score: resultado.score, captcha: resultado.success }
         )
+    }
+
+    getNombreCompleto(usuario) {
+        const partes = [
+            usuario.nombre1,
+            usuario.nombre2 ? usuario.nombre2 : "",
+            usuario.apellido1,
+            usuario.apellido2 ? usuario.apellido2 : ""
+        ]
+
+        return partes.join(" ")
     }
 }
