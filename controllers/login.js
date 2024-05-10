@@ -43,7 +43,7 @@ export class LoginController {
         }
 
         return res
-            .status(resultado.informacion?.mensaje == "Credenciales incorrectas." ? 400 : 500)
+            .status(resultado.errores[0] == "Credenciales incorrectas." ? 400 : 500)
             .json(resultado)
     }
 
