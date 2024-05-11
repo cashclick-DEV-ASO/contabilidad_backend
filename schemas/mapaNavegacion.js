@@ -30,6 +30,10 @@ const mapaJSON = {
                     registro: { titulo: "Registro", vista: "RegTrnMambu" },
                     consulta: { titulo: "Consulta", vista: "ConTrnMambu" }
                 }
+            },
+            virtuales: {
+                titulo: "Virtuales",
+                vista: "ConTrnVirtual"
             }
         }
     },
