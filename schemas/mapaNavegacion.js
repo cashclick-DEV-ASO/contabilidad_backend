@@ -81,13 +81,14 @@ const mapaJSON = {
             //         consulta: { titulo: "Consulta", vista: "ConCtasContables" }
             //     }
             // },
-            plantillas: {
-                titulo: "Plantillas",
-                vista: {
-                    layout: { titulo: "Layout", vista: "Layout" },
-                    Etiquetas: { titulo: "Etiquetas", vista: "Etiquetas" }
-                }
-            },
+            // plantillas: {
+            //     titulo: "Plantillas",
+            //     vista: {
+            //         layout: { titulo: "Layout", vista: "Layout" },
+            //         Etiquetas: { titulo: "Etiquetas", vista: "Etiquetas" }
+            //     }
+            // },
+            layouts: { titulo: "Layout's", vista: "Layout" },
             usuarios: {
                 titulo: "Usuarios",
                 vista: {
