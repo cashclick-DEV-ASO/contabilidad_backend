@@ -19,8 +19,21 @@ export class NoConfigModelo extends Modelo {
 
             conexion.beginTransaction()
             const { query, parametros } = datos
-            resultado = await conexion.query(query, parametros ?? [])
-            resultado = resultado[0] ?? []
+            if (parametros[0] === "MODO_MULTIPLE") {
+                const queries = query.split(";")
+                for (let i = 0; i < queries.length; i++) {
+                    let q = queries[i].trim()
+                    if (!q) continue
+                    let r = await conexion.query(q, [])
+                    if (r[0].affectedRows === 0)
+                        throw new Error(`Error al ejecutar la consulta ${i + 1} (${queries[i]}).`)
+                }
+                resultado = { affectedRows: queries.length }
+            } else {
+                resultado = await conexion.query(query, parametros ?? [])
+                resultado = resultado[0] ?? []
+            }
+
             conexion.commit()
         } catch (e) {
             console.log(e)
