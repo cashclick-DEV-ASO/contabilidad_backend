@@ -130,6 +130,6 @@ export class LoginModel extends Modelo {
             usuario.apellido2 ? usuario.apellido2 : ""
         ]
 
-        return partes.join(" ")
+        return partes.join(" ").trim()
     }
 }
