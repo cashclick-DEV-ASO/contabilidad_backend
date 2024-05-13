@@ -52,16 +52,16 @@ const mapaJSON = {
             saf: { titulo: "Saldo a Favor", vista: "ResSaldoFavor" },
             recalculoInteres: { titulo: "Recalculo de Interés", vista: "RecalculoInteres" },
             recalculoCapital: { titulo: "Recalculo de Capital", vista: "RecalculoCapital" },
-            cartera: { titulo: "Cartera", vista: "Cartera" },
+            // cartera: { titulo: "Cartera", vista: "Cartera" },
             aclaraciones: {
                 titulo: "Aclaraciones",
                 vista: {
                     registro: { titulo: "Registro", vista: "RegAclaraciones" },
                     consulta: { titulo: "Consulta", vista: "ConAclaraciones" }
                 }
-            },
-            ajustes: { titulo: "Ajustes", vista: "Ajustes" },
-            edoCta: { titulo: "Estado de Cuenta", vista: "EdoCta" }
+            }
+            // ajustes: { titulo: "Ajustes", vista: "Ajustes" },
+            // edoCta: { titulo: "Resumen por crédito", vista: "EdoCta" }
         }
     },
     administracion: {
